@@ -212,12 +212,14 @@ export default function Layout({ children }) {
 
             {/* Bilingual Toggle VI / EN */}
             <button
-              onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
+              type="button"
+              data-testid="lang-toggle"
+              onClick={() => setLang((prev) => (prev === 'vi' ? 'en' : 'vi'))}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition"
               title="Switch Language VI / EN"
             >
               <Globe className="w-3.5 h-3.5 text-brand-blue" />
-              <span>{lang === 'vi' ? 'VI 🇻🇳' : 'EN 🇬🇧'}</span>
+              <span>{lang === 'vi' ? 'Ngôn ngữ: VI' : 'Lang: EN'}</span>
             </button>
 
             {/* Connect Wallet Primary Button */}

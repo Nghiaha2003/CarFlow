@@ -28,13 +28,17 @@ export default function ProgressPage() {
       setLoading(true);
       setError(null);
       const res = await apiClient('/api/v1/system/progress', { signal });
-      setData(res);
+      if (!signal?.aborted) {
+        setData(res);
+      }
     } catch (err) {
-      if (err.name !== 'AbortError') {
+      if (err.name !== 'AbortError' && !signal?.aborted) {
         setError(err.message || 'Không thể kết nối tới Backend API.');
       }
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -44,7 +48,7 @@ export default function ProgressPage() {
     return () => controller.abort();
   }, [loadProgress]);
 
-  if (loading && !data) {
+  if ((loading && !data) || (!data && !error)) {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-36 rounded-3xl bg-white border border-slate-200" />

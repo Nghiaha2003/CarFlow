@@ -11,9 +11,17 @@ export default function MarketplacePreviewPage() {
   useEffect(() => {
     const controller = new AbortController();
     apiClient('/api/v1/system/preview-overview', { signal: controller.signal })
-      .then((res) => setAssets(res?.assets || []))
+      .then((res) => {
+        if (!controller.signal.aborted) {
+          setAssets(res?.assets || []);
+        }
+      })
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      });
     return () => controller.abort();
   }, []);
 
