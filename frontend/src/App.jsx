@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage';
 import AccountSecurityPage from './pages/AccountSecurityPage';
 import ProgressPage from './pages/ProgressPage';
 import MarketplacePreviewPage from './pages/MarketplacePreviewPage';
+import AssetDetailPage from './pages/AssetDetailPage';
+import TransfersPage from './pages/TransfersPage';
 import MyVehiclesPage from './pages/MyVehiclesPage';
 import AdminStudioPage from './pages/AdminStudioPage';
 import ModuleBlueprintPage from './pages/ModuleBlueprintPage';
@@ -27,25 +29,10 @@ export default function App() {
                     <Route path="/progress" element={<ProgressPage />} />
                     <Route path="/account" element={<AccountSecurityPage />} />
                     <Route path="/marketplace" element={<MarketplacePreviewPage />} />
+                    <Route path="/marketplace/:id" element={<AssetDetailPage />} />
                     <Route path="/my-vehicles" element={<MyVehiclesPage />} />
                     <Route path="/admin" element={<AdminStudioPage />} />
-
-            <Route
-              path="/transfers"
-              element={
-                <ModuleBlueprintPage
-                  moduleCode="Module 5"
-                  titleVi="Sổ cái Giao dịch & Chuyển nhượng Tuân thủ ERC-3643"
-                  titleEn="On-Chain Transaction Ledger & Compliant ERC-3643 Transfers"
-                  summaryVi="Theo dõi toàn bộ lịch sử mua cổ phần sơ cấp và chuyển nhượng thứ cấp giữa các ví đã xác thực KYC, đối chiếu trực tiếp mã giao dịch blockchain_tx_hash."
-                  summaryEn="Full ledger of primary share purchases and compliant secondary transfers between KYC-verified wallets."
-                  features={[
-                    { vi: 'Chuyển nhượng cổ phần ERC-3643 có kiểm tra điều kiện tuân thủ tự động trên Smart Contract', en: 'Peer-to-peer ERC-3643 share transfer with automated compliance check' },
-                    { vi: 'Tra cứu và đối chiếu mã giao dịch Blockchain (tx_hash)', en: 'Direct Blockchain transaction hash verification' },
-                  ]}
-                />
-              }
-            />
+                    <Route path="/transfers" element={<TransfersPage />} />
 
             <Route
               path="/investments"
