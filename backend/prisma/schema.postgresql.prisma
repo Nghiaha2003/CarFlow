@@ -1,0 +1,11 @@
+// Mirror schema for PostgreSQL deployment (swap provider = "postgresql" when connecting to PostgreSQL / Neon / Supabase)
+// Identical 12-table structure as schema.prisma (Report_DATN.docx Section 5.3.2).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}

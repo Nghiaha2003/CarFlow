@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Bảng 5.7: roles
+model Role {
+  id          String   @id @default(uuid())
+  roleName    String   @unique @map("role_name") // ADMIN, OWNER, INVESTOR, OPERATOR
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  users       User[]
+
+  @@map("roles")
+}
+
+// 2. Bảng 5.8: users
+model User {
+  id              String   @id @default(uuid())
+  roleId          String   @map("role_id")
+  fullName        String   @map("full_name")
+  email           String   @unique
+  passwordHash    String   @map("password_hash")
+  phoneNumber     String?  @map("phone_number")
+  walletAddress   String?  @unique @map("wallet_address")
+  kycStatus       String   @default("UNVERIFIED") @map("kyc_status") // UNVERIFIED, PENDING, VERIFIED (ERC-3643 ONCHAINID)
+  status          String   @default("active") // active, inactive, locked
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  role                   Role                      @relation(fields: [roleId], references: [id])
+  ownedAssets            Asset[]                   @relation("AssetOwner")
+  operatorAssignments    AssetOperatorAssignment[] @relation("AssignedOperator")
+  uploadedDocuments      AssetDocument[]           @relation("DocumentUploader")
+  tokenizationRequested  TokenizationRequest[]     @relation("RequestCreator")
+  tokenizationReviewed   TokenizationRequest[]     @relation("RequestReviewer")
+  sentTransactions       TokenTransaction[]        @relation("TxSender")
+  receivedTransactions   TokenTransaction[]        @relation("TxReceiver")
+  tokenHoldings          TokenHolding[]
+  operationRecords       OperationRecord[]
+  reportLogs             ReportLog[]
+  auditLogs              AuditLog[]
+
+  @@map("users")
+}
+
+// 3. Bảng 5.9: assets
+model Asset {
+  id                 String   @id @default(uuid())
+  ownerId            String   @map("owner_id")
+  assetCode          String   @unique @map("asset_code")
+  vehicleName        String   @map("vehicle_name")
+  vehicleSegment     String   @default("EV") @map("vehicle_segment") // EV, Luxury, Logistics, Commercial
+  manufactureYear    Int      @default(2025) @map("manufacture_year")
+  location           String   @default("TP. Hồ Chí Minh")
+  imageUrl           String?  @map("image_url")
+  licensePlate       String   @unique @map("license_plate")
+  chassisNumber      String?  @unique @map("chassis_number") // VIN
+  engineNumber       String?  @map("engine_number")
+  estimatedValue     Float    @map("estimated_value")
+  targetApr          Float    @default(12.5) @map("target_apr")
+  utilizationRate    Float    @default(88.0) @map("utilization_rate")
+  usageStatus        String   @default("OPERATING") @map("usage_status") // OPERATING, MAINTENANCE, PAUSED
+  tokenizationStatus String   @default("DRAFT") @map("tokenization_status") // DRAFT, PENDING_REVIEW, TOKENIZED, REJECTED
+  description        String?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  owner                User                      @relation("AssetOwner", fields: [ownerId], references: [id])
+  operatorAssignments  AssetOperatorAssignment[]
+  documents            AssetDocument[]
+  tokenizationRequests TokenizationRequest[]
+  tokens               AssetToken[]
+  operationRecords     OperationRecord[]
+
+  @@map("assets")
+}
+
+// 4. Bảng 5.10: asset_operator_assignments
+model AssetOperatorAssignment {
+  id           String    @id @default(uuid())
+  assetId      String    @map("asset_id")
+  operatorId   String    @map("operator_id")
+  assignedAt   DateTime  @default(now()) @map("assigned_at")
+  unassignedAt DateTime? @map("unassigned_at")
+  status       String    @default("active") // active, inactive
+
+  asset    Asset @relation(fields: [assetId], references: [id])
+  operator User  @relation("AssignedOperator", fields: [operatorId], references: [id])
+
+  @@map("asset_operator_assignments")
+}
+
+// 5. Bảng 5.11: asset_documents
+model AssetDocument {
+  id                 String   @id @default(uuid())
+  assetId            String   @map("asset_id")
+  uploadedBy         String   @map("uploaded_by")
+  documentType       String   @map("document_type") // registration, insurance, inspection, image
+  fileName           String   @map("file_name")
+  fileUrl            String   @map("file_url")
+  ipfsCid            String?  @map("ipfs_cid")
+  documentHash       String?  @map("document_hash")
+  verificationStatus String   @default("VERIFIED") @map("verification_status") // PENDING, VERIFIED, REJECTED
+  uploadedAt         DateTime @default(now()) @map("uploaded_at")
+
+  asset    Asset @relation(fields: [assetId], references: [id])
+  uploader User  @relation("DocumentUploader", fields: [uploadedBy], references: [id])
+
+  @@map("asset_documents")
+}
+
+// 6. Bảng 5.12: tokenization_requests
+model TokenizationRequest {
+  id            String    @id @default(uuid())
+  assetId       String    @map("asset_id")
+  requestedBy   String    @map("requested_by")
+  reviewedBy    String?   @map("reviewed_by")
+  requestStatus String    @default("pending") @map("request_status") // pending, approved, rejected
+  proposedSupply Float    @default(10000) @map("proposed_supply")
+  unitPrice     Float     @default(10) @map("unit_price")
+  requestNote   String?   @map("request_note")
+  reviewNote    String?   @map("review_note")
+  requestedAt   DateTime  @default(now()) @map("requested_at")
+  reviewedAt    DateTime? @map("reviewed_at")
+
+  asset     Asset @relation(fields: [assetId], references: [id])
+  requester User  @relation("RequestCreator", fields: [requestedBy], references: [id])
+  reviewer  User? @relation("RequestReviewer", fields: [reviewedBy], references: [id])
+
+  @@map("tokenization_requests")
+}
+
+// 7. Bảng 5.13: asset_tokens
+model AssetToken {
+  id               String   @id @default(uuid())
+  assetId          String   @map("asset_id")
+  tokenType        String   @map("token_type") // ERC3643_SHARE, ERC4626_VAULT
+  tokenStandard    String   @map("token_standard") // ERC-3643, ERC-4626
+  tokenSymbol      String   @default("CFRWA") @map("token_symbol")
+  contractAddress  String   @map("contract_address")
+  vaultAddress     String?  @map("vault_address")
+  registryHash     String?  @map("registry_hash")
+  totalSupply      Float    @map("total_supply")
+  availableSupply  Float    @default(0) @map("available_supply")
+  unitPrice        Float    @default(10) @map("unit_price")
+  metadataUri      String?  @map("metadata_uri")
+  metadataHash     String?  @map("metadata_hash")
+  mintTxHash       String?  @map("mint_tx_hash")
+  tokenStatus      String   @default("active") @map("token_status") // active, paused, burned
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  asset        Asset              @relation(fields: [assetId], references: [id])
+  transactions TokenTransaction[]
+  holdings     TokenHolding[]
+
+  @@map("asset_tokens")
+}
+
+// 8. Bảng 5.14: token_transactions
+model TokenTransaction {
+  id                String   @id @default(uuid())
+  assetTokenId      String   @map("asset_token_id")
+  fromUserId        String?  @map("from_user_id")
+  toUserId          String   @map("to_user_id")
+  transactionType   String   @map("transaction_type") // mint, buy, sell, transfer, dividend_claim
+  tokenAmount       Float    @map("token_amount")
+  unitPrice         Float    @map("unit_price")
+  totalValue        Float    @map("total_value")
+  blockchainTxHash  String?  @map("blockchain_tx_hash")
+  transactionStatus String   @default("success") @map("transaction_status") // pending, success, failed
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  assetToken AssetToken @relation(fields: [assetTokenId], references: [id])
+  fromUser   User?      @relation("TxSender", fields: [fromUserId], references: [id])
+  toUser     User       @relation("TxReceiver", fields: [toUserId], references: [id])
+
+  @@map("token_transactions")
+}
+
+// 9. Bảng 5.15: token_holdings
+model TokenHolding {
+  id             String   @id @default(uuid())
+  investorId     String   @map("investor_id")
+  assetTokenId   String   @map("asset_token_id")
+  tokenBalance   Float    @map("token_balance")
+  claimedYield   Float    @default(0) @map("claimed_yield")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  investor   User       @relation(fields: [investorId], references: [id])
+  assetToken AssetToken @relation(fields: [assetTokenId], references: [id])
+
+  @@unique([investorId, assetTokenId])
+  @@map("token_holdings")
+}
+
+// 10. Bảng 5.16: operation_records
+model OperationRecord {
+  id              String   @id @default(uuid())
+  assetId         String   @map("asset_id")
+  operatorId      String   @map("operator_id")
+  operationStatus String   @map("operation_status") // COMPLETED_SHIFT, MAINTENANCE, CHARGING
+  mileage         Int
+  revenue         Float
+  cost            Float
+  netProfit       Float    @default(0) @map("net_profit")
+  note            String?
+  recordedAt      DateTime @default(now()) @map("recorded_at")
+
+  asset    Asset @relation(fields: [assetId], references: [id])
+  operator User  @relation(fields: [operatorId], references: [id])
+
+  @@map("operation_records")
+}
+
+// 11. Bảng 5.17: report_logs
+model ReportLog {
+  id              String   @id @default(uuid())
+  createdBy       String   @map("created_by")
+  reportType      String   @map("report_type") // asset_summary, transaction_summary, operation_summary
+  filterCondition String?  @map("filter_condition")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  creator User @relation(fields: [createdBy], references: [id])
+
+  @@map("report_logs")
+}
+
+// 12. Bảng 5.18: audit_logs
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String   @map("actor_id")
+  action     String
+  entityType String   @map("entity_type") // asset, token, transaction, operation, kyc
+  entityId   String   @map("entity_id")
+  oldValue   String?  @map("old_value")
+  newValue   String?  @map("new_value")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  actor User @relation(fields: [actorId], references: [id])
+
+  @@map("audit_logs")
+}
