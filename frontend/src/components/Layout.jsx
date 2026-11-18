@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   Activity,
   LayoutGrid,
@@ -16,46 +16,55 @@ import {
   Menu,
   X,
   Database,
+  UserCheck,
+  LogOut,
+  LogIn,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Layout({ children }) {
   const { lang, setLang, t } = useLanguage();
+  const { user, logout, linkWallet } = useAuth();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [walletAddr, setWalletAddr] = useState(null);
 
-  const handleQuickWalletCheck = async () => {
+  const activeWallet = user?.walletAddress || null;
+
+  const handleWalletAction = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     if (window.ethereum) {
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        if (accounts?.[0]) setWalletAddr(accounts[0]);
+        if (accounts?.[0]) {
+          await linkWallet(accounts[0]);
+          return;
+        }
       } catch {
-        // User rejected or cancelled
+        // fallback to account page
       }
-    } else {
-      alert(
-        lang === 'vi'
-          ? 'Trình duyệt hiện chưa cài tiện ích MetaMask. Trong Module 1, hệ thống sẽ tích hợp thêm chế độ Ví Demo ký thử nghiệm ngay trên trình duyệt song song với MetaMask thật!'
-          : 'MetaMask extension not detected. Module 1 adds full MetaMask + Local Signer support!'
-      );
     }
+    navigate('/account');
   };
 
   const navItems = [
     { to: '/progress', icon: Activity, label: t.progressTracker, badge: 'LIVE' },
-    { to: '/command-center', icon: LayoutGrid, label: t.commandCenter, moduleTag: 'M7' },
+    { to: '/account', icon: UserCheck, label: lang === 'vi' ? 'Tài khoản & KYC' : 'Account & KYC', badge: 'M1' },
+    { to: '/command-center', icon: LayoutGrid, label: t.commandCenter },
     { to: '/marketplace', icon: Car, label: t.marketplace, badge: 'DB' },
-    { to: '/investments', icon: Wallet, label: t.investments, moduleTag: 'M6' },
-    { to: '/my-vehicles', icon: FileCheck2, label: t.myVehicles, moduleTag: 'M2' },
-    { to: '/operations', icon: Wrench, label: t.operations, moduleTag: 'M6' },
-    { to: '/transfers', icon: ArrowLeftRight, label: t.transfers, moduleTag: 'M5' },
-    { to: '/reports', icon: BarChart3, label: t.reports, moduleTag: 'M7' },
-    { to: '/admin', icon: ShieldCheck, label: t.adminStudio, moduleTag: 'M4' },
+    { to: '/investments', icon: Wallet, label: t.investments },
+    { to: '/my-vehicles', icon: FileCheck2, label: t.myVehicles },
+    { to: '/operations', icon: Wrench, label: t.operations },
+    { to: '/transfers', icon: ArrowLeftRight, label: t.transfers },
+    { to: '/reports', icon: BarChart3, label: t.reports },
+    { to: '/admin', icon: ShieldCheck, label: t.adminStudio },
   ];
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-white border-r border-slate-200/90 w-[264px] select-none">
-      {/* Brand Header matching Fig 5.17-5.20 */}
       <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-navy-900 flex items-center justify-center shadow-sm">
           <Zap className="w-5 h-5 text-teal-400" />
@@ -76,7 +85,6 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      {/* Navigation Links */}
       <div className="flex-1 overflow-y-auto px-3.5 py-5">
         <p className="px-3 mb-2.5 text-[11px] font-bold tracking-widest text-slate-400 uppercase">
           {t.navSection}
@@ -114,15 +122,6 @@ export default function Layout({ children }) {
                         {item.badge}
                       </span>
                     )}
-                    {item.moduleTag && (
-                      <span
-                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                          isActive ? 'bg-white/10 text-slate-300' : 'bg-slate-100 text-slate-500'
-                        }`}
-                      >
-                        {item.moduleTag}
-                      </span>
-                    )}
                   </>
                 )}
               </NavLink>
@@ -131,7 +130,6 @@ export default function Layout({ children }) {
         </nav>
       </div>
 
-      {/* Bottom Web3 Status Card matching Fig 5.17-5.20 */}
       <div className="p-4 border-t border-slate-100">
         <div className="rounded-2xl bg-slate-50 border border-slate-200/80 p-3.5">
           <div className="flex items-center gap-2.5 mb-3">
@@ -143,17 +141,18 @@ export default function Layout({ children }) {
                 {t.web3Status}
               </div>
               <div className="text-xs font-bold text-slate-800 truncate tabular-nums">
-                {walletAddr
-                  ? `${walletAddr.slice(0, 6)}...${walletAddr.slice(-4)}`
+                {activeWallet
+                  ? `${activeWallet.slice(0, 6)}...${activeWallet.slice(-4)}`
                   : t.notConnected}
               </div>
             </div>
           </div>
           <button
-            onClick={handleQuickWalletCheck}
+            type="button"
+            onClick={handleWalletAction}
             className="w-full py-2 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 text-white text-xs font-bold tracking-wide transition flex items-center justify-center gap-1.5"
           >
-            <span>+ {t.connectWallet}</span>
+            <span>{activeWallet ? (lang === 'vi' ? 'Đổi Ví Web3' : 'Manage Wallet') : `+ ${t.connectWallet}`}</span>
           </button>
         </div>
       </div>
@@ -162,16 +161,15 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen flex bg-[#F6F8FB]">
-      {/* Desktop Sidebar */}
       <aside className="hidden lg:block shrink-0">{SidebarContent()}</aside>
 
-      {/* Mobile Drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div className="fixed inset-0 bg-slate-900/50" onClick={() => setMobileOpen(false)} />
           <div className="relative z-10 flex">
             {SidebarContent()}
             <button
+              type="button"
               onClick={() => setMobileOpen(false)}
               className="m-3 w-9 h-9 rounded-lg bg-white text-slate-700 flex items-center justify-center shadow"
             >
@@ -181,12 +179,11 @@ export default function Layout({ children }) {
         </div>
       )}
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar matching Fig 5.17-5.20 */}
         <header className="h-[72px] bg-white border-b border-slate-200/80 px-4 lg:px-8 flex items-center justify-between gap-4 sticky top-0 z-30">
           <div className="flex items-center gap-3 flex-1 max-w-xl">
             <button
+              type="button"
               onClick={() => setMobileOpen(true)}
               className="lg:hidden p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
             >
@@ -197,20 +194,19 @@ export default function Layout({ children }) {
               <input
                 type="text"
                 readOnly
+                onClick={() => navigate('/marketplace')}
                 placeholder={t.searchPlaceholder}
-                className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200/90 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+                className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200/90 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none cursor-pointer"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Live DB Pill */}
-            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+            <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
               <Database className="w-3.5 h-3.5 text-emerald-600" />
               <span>{t.liveDbBadge}</span>
             </div>
 
-            {/* Bilingual Toggle VI / EN */}
             <button
               type="button"
               data-testid="lang-toggle"
@@ -222,26 +218,45 @@ export default function Layout({ children }) {
               <span>{lang === 'vi' ? 'Ngôn ngữ: VI' : 'Lang: EN'}</span>
             </button>
 
-            {/* Connect Wallet Primary Button */}
-            <button
-              onClick={handleQuickWalletCheck}
-              className="px-4 py-2 rounded-xl bg-brand-blue hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-sm transition"
-            >
-              {walletAddr
-                ? `${walletAddr.slice(0, 6)}...${walletAddr.slice(-4)}`
-                : t.connectWallet}
-            </button>
-
-            {/* Active Profile Pill */}
-            <div className="hidden sm:flex items-center gap-2.5 pl-3 pr-3.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50/70">
-              <div className="w-7 h-7 rounded-lg bg-teal-600 text-white font-bold text-xs flex items-center justify-center">
-                HN
+            {user ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/account"
+                  className="flex items-center gap-2.5 pl-2.5 pr-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-teal-600 text-white font-bold text-xs flex items-center justify-center">
+                    {user.fullName.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="hidden sm:block leading-tight">
+                    <div className="text-xs font-bold text-slate-900 max-w-[130px] truncate">
+                      {user.fullName}
+                    </div>
+                    <div className="text-[10px] font-bold text-teal-700">
+                      {user.role} · {user.kycStatus}
+                    </div>
+                  </div>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    logout();
+                    navigate('/login');
+                  }}
+                  title="Đăng xuất"
+                  className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
-              <div className="leading-tight">
-                <div className="text-xs font-bold text-slate-900">HÀ ĐÌNH NGHĨA</div>
-                <div className="text-[10px] font-semibold text-slate-500">{t.roleAdmin}</div>
-              </div>
-            </div>
+            ) : (
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-blue hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-sm transition"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>{lang === 'vi' ? 'Đăng nhập' : 'Sign In'}</span>
+              </Link>
+            )}
           </div>
         </header>
 

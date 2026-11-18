@@ -1,7 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
+import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
+import LoginPage from './pages/LoginPage';
+import AccountSecurityPage from './pages/AccountSecurityPage';
 import ProgressPage from './pages/ProgressPage';
 import MarketplacePreviewPage from './pages/MarketplacePreviewPage';
 import ModuleBlueprintPage from './pages/ModuleBlueprintPage';
@@ -9,12 +12,19 @@ import ModuleBlueprintPage from './pages/ModuleBlueprintPage';
 export default function App() {
   return (
     <LanguageProvider>
-      <BrowserRouter>
-        <Layout>
+      <AuthProvider>
+        <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/progress" replace />} />
-            <Route path="/progress" element={<ProgressPage />} />
-            <Route path="/marketplace" element={<MarketplacePreviewPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/*"
+              element={
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/progress" replace />} />
+                    <Route path="/progress" element={<ProgressPage />} />
+                    <Route path="/account" element={<AccountSecurityPage />} />
+                    <Route path="/marketplace" element={<MarketplacePreviewPage />} />
 
             <Route
               path="/my-vehicles"
@@ -137,9 +147,13 @@ export default function App() {
                 />
               }
             />
+                  </Routes>
+                </Layout>
+              }
+            />
           </Routes>
-        </Layout>
-      </BrowserRouter>
+        </BrowserRouter>
+      </AuthProvider>
     </LanguageProvider>
   );
 }

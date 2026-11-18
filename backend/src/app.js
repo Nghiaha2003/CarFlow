@@ -1,13 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import systemRoutes from './routes/system.routes.js';
+import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/v1', systemRoutes);
+app.use('/api/v1', authRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error('[Backend Error]:', err);
