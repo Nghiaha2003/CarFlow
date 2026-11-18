@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import AccountSecurityPage from './pages/AccountSecurityPage';
 import ProgressPage from './pages/ProgressPage';
 import MarketplacePreviewPage from './pages/MarketplacePreviewPage';
+import MyVehiclesPage from './pages/MyVehiclesPage';
 import ModuleBlueprintPage from './pages/ModuleBlueprintPage';
 
 export default function App() {
@@ -25,24 +26,7 @@ export default function App() {
                     <Route path="/progress" element={<ProgressPage />} />
                     <Route path="/account" element={<AccountSecurityPage />} />
                     <Route path="/marketplace" element={<MarketplacePreviewPage />} />
-
-            <Route
-              path="/my-vehicles"
-              element={
-                <ModuleBlueprintPage
-                  moduleCode="Module 2"
-                  titleVi="Quản lý Hồ sơ Tài sản Xe & Chứng từ Pháp lý IPFS"
-                  titleEn="Vehicle Asset Onboarding & IPFS Legal Proofs"
-                  summaryVi="Phân hệ dành cho Chủ tài sản (Asset Owner) khai báo phương tiện mới, tải giấy đăng ký/đăng kiểm/bảo hiểm lên IPFS và gửi yêu cầu phát hành token hóa."
-                  summaryEn="Portal for Asset Owners to register commercial vehicles, hash & pin legal documents to IPFS, and submit tokenization requests."
-                  features={[
-                    { vi: 'Biểu mẫu khai báo thông tin kỹ thuật, biển số, số khung VIN và định giá xe (API-04)', en: 'Vehicle registration form with VIN, plate, and valuation (API-04)' },
-                    { vi: 'Tự động băm SHA-256 và sinh mã định danh CID IPFS cho giấy tờ pháp lý (API-05)', en: 'SHA-256 cryptographic hashing & IPFS CID generation for legal docs (API-05)' },
-                    { vi: 'Theo dõi trạng thái thẩm định hồ sơ từ Quản trị viên', en: 'Real-time review status tracking from System Admin' },
-                  ]}
-                />
-              }
-            />
+                    <Route path="/my-vehicles" element={<MyVehiclesPage />} />
 
             <Route
               path="/admin"
