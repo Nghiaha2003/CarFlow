@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import systemRoutes from './routes/system.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import assetRoutes from './routes/assets.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -16,6 +17,7 @@ app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 app.use('/api/v1', systemRoutes);
 app.use('/api/v1', authRoutes);
 app.use('/api/v1', assetRoutes);
+app.use('/api/v1', adminRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error('[Backend Error]:', err);

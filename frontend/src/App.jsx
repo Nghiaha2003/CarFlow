@@ -8,6 +8,7 @@ import AccountSecurityPage from './pages/AccountSecurityPage';
 import ProgressPage from './pages/ProgressPage';
 import MarketplacePreviewPage from './pages/MarketplacePreviewPage';
 import MyVehiclesPage from './pages/MyVehiclesPage';
+import AdminStudioPage from './pages/AdminStudioPage';
 import ModuleBlueprintPage from './pages/ModuleBlueprintPage';
 
 export default function App() {
@@ -27,24 +28,7 @@ export default function App() {
                     <Route path="/account" element={<AccountSecurityPage />} />
                     <Route path="/marketplace" element={<MarketplacePreviewPage />} />
                     <Route path="/my-vehicles" element={<MyVehiclesPage />} />
-
-            <Route
-              path="/admin"
-              element={
-                <ModuleBlueprintPage
-                  moduleCode="Module 4"
-                  titleVi="Admin Studio — Kiểm duyệt KYC & Phát hành Token RWA On-chain"
-                  titleEn="Admin Studio — KYC Compliance & On-Chain RWA Minting"
-                  summaryVi="Không gian làm việc đặc quyền theo Hình 5.19 để Admin duyệt KYC nhà đầu tư và kích hoạt hợp đồng thông minh đúc định danh xe + triển khai VehicleShareToken (ERC-3643) & DividendVault (ERC-4626)."
-                  summaryEn="Privileged workspace matching Figure 5.19 for KYC whitelisting and deploying VehicleShareToken (ERC-3643) & DividendVault (ERC-4626)."
-                  features={[
-                    { vi: 'Duyệt danh tính KYC/ONCHAINID cho địa chỉ ví Nhà đầu tư', en: 'Verify Investor wallet KYC for ERC-3643 compliance whitelist' },
-                    { vi: 'Thẩm định chứng từ IPFS và gọi AssetTokenizationManager trên chuỗi EVM (API-06)', en: 'Audit IPFS proofs & trigger AssetTokenizationManager on-chain (API-06)' },
-                    { vi: 'Phân công Người vận hành (Operator) cho từng phương tiện', en: 'Assign verified Fleet Operators to tokenized vehicles' },
-                  ]}
-                />
-              }
-            />
+                    <Route path="/admin" element={<AdminStudioPage />} />
 
             <Route
               path="/transfers"
