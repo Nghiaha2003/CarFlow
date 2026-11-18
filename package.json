@@ -1,10 +1,13 @@
 {
   "name": "carflow-rwa",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "CarFlow RWA - Real-World Vehicle Asset Management & Tokenization Platform (ERC-3643 & ERC-4626)",
   "scripts": {
-    "setup": "npm --prefix backend install && npm --prefix frontend install",
+    "setup": "npm --prefix contracts install && npm --prefix backend install && npm --prefix frontend install",
+    "contracts:compile": "npm --prefix contracts run compile",
+    "contracts:test": "npm --prefix contracts test",
+    "dev:chain": "npm --prefix contracts run node",
     "db:push": "npm --prefix backend run db:push",
     "db:seed": "npm --prefix backend run db:seed",
     "dev:backend": "npm --prefix backend run dev",

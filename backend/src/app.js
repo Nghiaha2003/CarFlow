@@ -8,6 +8,7 @@ import assetRoutes from './routes/assets.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import marketplaceRoutes from './routes/marketplace.routes.js';
 import operationRoutes from './routes/operations.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -22,6 +23,7 @@ app.use('/api/v1', assetRoutes);
 app.use('/api/v1', adminRoutes);
 app.use('/api/v1', marketplaceRoutes);
 app.use('/api/v1', operationRoutes);
+app.use('/api/v1', analyticsRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error('[Backend Error]:', err);
