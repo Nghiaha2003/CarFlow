@@ -21,6 +21,7 @@ build/
 coverage/
 cache/
 artifacts/
+contracts/deployed-addresses.json
 typechain-types/
 .vite/
 

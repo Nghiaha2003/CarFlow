@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { JsonRpcProvider } from 'ethers';
 import { prisma } from '../config/prisma.js';
 import { PROJECT_MODULES, INSTALLED_AAS_SKILLS } from '../data/roadmap.js';
+import { ensureCoreContracts } from '../services/blockchain.service.js';
 
 const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,14 +41,22 @@ function getGitStatusInfo() {
 async function checkBlockchainRpc() {
   const rpcUrl = process.env.BLOCKCHAIN_RPC_URL || 'http://127.0.0.1:8545';
   try {
-    const provider = new JsonRpcProvider(rpcUrl);
+    const provider = new JsonRpcProvider(rpcUrl, undefined, { cacheTimeout: -1 });
     const network = await Promise.race([
       provider.getNetwork(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 600)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 800)),
     ]);
-    return { connected: true, rpcUrl, chainId: Number(network.chainId) };
+    const coreContracts = await ensureCoreContracts();
+    const blockNumber = await provider.getBlockNumber();
+    return {
+      connected: true,
+      rpcUrl,
+      chainId: Number(network.chainId),
+      blockNumber,
+      contracts: coreContracts,
+    };
   } catch {
-    return { connected: false, rpcUrl, chainId: null, note: 'Scheduled in Module 3 (Hardhat / Hyperledger Besu EVM)' };
+    return { connected: false, rpcUrl, chainId: null, contracts: null };
   }
 }
 

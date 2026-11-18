@@ -1,0 +1,187 @@
+{
+  "contractName": "OnchainIdentityRegistry",
+  "sourceName": "OnchainIdentityRegistry.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "UnauthorizedAgent",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "agent",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "active",
+          "type": "bool"
+        }
+      ],
+      "name": "AgentUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "wallet",
+          "type": "address"
+        }
+      ],
+      "name": "IdentityRevoked",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "wallet",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "claimHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "IdentityVerified",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "admin",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "agents",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "wallet",
+          "type": "address"
+        }
+      ],
+      "name": "isVerified",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "kycClaimHashes",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "wallet",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "claimHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "registerIdentity",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "wallet",
+          "type": "address"
+        }
+      ],
+      "name": "revokeIdentity",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "agent",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "active",
+          "type": "bool"
+        }
+      ],
+      "name": "setAgent",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600e575f80fd5b505f80546001600160a01b0319163390811782558152600160208181526040808420805460ff1990811685179091556002835281852080549091169093179092556003905290207f87b54d295b1cb0e54c66a316c469d1a811fb19891d110d2309f0820baed2370b90556103fd806100855f395ff3fe608060405234801561000f575f80fd5b506004361061007a575f3560e01c8063b9209e3311610058578063b9209e33146100d8578063e2706d0714610113578063f851a44014610126578063fd66091e14610150575f80fd5b80630ebddd171461007e57806397d8c67614610093578063acff2be4146100a6575b5f80fd5b61009161008c366004610346565b610172565b005b6100916100a1366004610366565b610200565b6100c56100b4366004610346565b60036020525f908152604090205481565b6040519081526020015b60405180910390f35b6101036100e6366004610346565b6001600160a01b03165f9081526002602052604090205460ff1690565b60405190151581526020016100cf565b61009161012136600461039f565b610288565b5f54610138906001600160a01b031681565b6040516001600160a01b0390911681526020016100cf565b61010361015e366004610346565b60016020525f908152604090205460ff1681565b5f546001600160a01b0316331480159061019b5750335f9081526001602052604090205460ff16155b156101b857604051624b0ebd60e41b815260040160405180910390fd5b6001600160a01b0381165f81815260026020526040808220805460ff19169055517fccf550e579fbeb7d56da9a0175f8d4526535cab139e73b592516f1916d4075dd9190a250565b5f546001600160a01b0316331461022957604051624b0ebd60e41b815260040160405180910390fd5b6001600160a01b0382165f81815260016020908152604091829020805460ff191685151590811790915591519182527fe9426c05342415a2258554b212d5c628e522888281554af132005b419bfb43b991015b60405180910390a25050565b5f546001600160a01b031633148015906102b15750335f9081526001602052604090205460ff16155b156102ce57604051624b0ebd60e41b815260040160405180910390fd5b6001600160a01b0382165f818152600260209081526040808320805460ff19166001179055600382529182902084905590518381527fb995343050bbaac74530262032b1b2520405a1ae1ce825b4b56917c29960ca01910161027c565b80356001600160a01b0381168114610341575f80fd5b919050565b5f60208284031215610356575f80fd5b61035f8261032b565b9392505050565b5f8060408385031215610377575f80fd5b6103808361032b565b915060208301358015158114610394575f80fd5b809150509250929050565b5f80604083850312156103b0575f80fd5b6103b98361032b565b94602093909301359350505056fea26469706673582212205a851a575eecfc127832b72f2ea7e75a45809597d907293d816e19e1e339e97164736f6c634300081a0033"
+}
