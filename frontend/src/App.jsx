@@ -9,6 +9,8 @@ import ProgressPage from './pages/ProgressPage';
 import MarketplacePreviewPage from './pages/MarketplacePreviewPage';
 import AssetDetailPage from './pages/AssetDetailPage';
 import TransfersPage from './pages/TransfersPage';
+import InvestmentsPage from './pages/InvestmentsPage';
+import OperationsPage from './pages/OperationsPage';
 import MyVehiclesPage from './pages/MyVehiclesPage';
 import AdminStudioPage from './pages/AdminStudioPage';
 import ModuleBlueprintPage from './pages/ModuleBlueprintPage';
@@ -33,41 +35,8 @@ export default function App() {
                     <Route path="/my-vehicles" element={<MyVehiclesPage />} />
                     <Route path="/admin" element={<AdminStudioPage />} />
                     <Route path="/transfers" element={<TransfersPage />} />
-
-            <Route
-              path="/investments"
-              element={
-                <ModuleBlueprintPage
-                  moduleCode="Module 6"
-                  titleVi="Danh mục Đầu tư & Kho Cổ tức Tự động (ERC-4626 Yield Vaults)"
-                  titleEn="My Portfolio & ERC-4626 Dividend Yield Vaults"
-                  summaryVi="Giao diện theo mẫu Investments trong báo cáo: hiển thị tổng vốn đầu tư, tỷ suất lợi nhuận thực tế và nút Withdraw Earnings rút cổ tức trực tiếp từ hợp đồng DividendVault."
-                  summaryEn="Portfolio dashboard displaying active ERC-3643 share positions, accrued revenue share, and 1-click Withdraw Earnings from ERC-4626 Vaults."
-                  features={[
-                    { vi: 'Tổng hợp giá trị cổ phần nắm giữ (token_holdings) theo thời gian thực', en: 'Real-time portfolio valuation across tokenized vehicles' },
-                    { vi: 'Tự động tính toán cổ tức được chia theo tỷ lệ nắm giữ VehicleShareToken', en: 'Pro-rata yield calculation via ERC-4626 DividendVault' },
-                    { vi: 'Rút lợi tức trực tiếp về ví MetaMask', en: 'Claim & withdraw earnings directly to MetaMask wallet' },
-                  ]}
-                />
-              }
-            />
-
-            <Route
-              path="/operations"
-              element={
-                <ModuleBlueprintPage
-                  moduleCode="Module 6"
-                  titleVi="Nhật ký Vận hành Đội xe, Sạc điện & Bảo dưỡng"
-                  titleEn="Daily Fleet Operations, Charging & Maintenance Logs"
-                  summaryVi="Phân hệ dành cho Người vận hành (Operator) cập nhật quãng đường di chuyển, doanh thu khai thác, chi phí nhiên liệu/bảo dưỡng hàng ngày và nạp lợi nhuận ròng vào Vault."
-                  summaryEn="Operator portal for logging daily mileage, gross trip revenue, charging/maintenance costs, and syncing net yield."
-                  features={[
-                    { vi: 'Cập nhật nhật ký ca chạy xe hàng ngày của phương tiện được phân công (API-09)', en: 'Log daily mileage, revenue, and expenses for assigned vehicles (API-09)' },
-                    { vi: 'Lưu vết kiểm toán (audit_logs) mọi thao tác cập nhật số liệu', en: 'Immutable audit trail logging for operational updates' },
-                  ]}
-                />
-              }
-            />
+                    <Route path="/investments" element={<InvestmentsPage />} />
+                    <Route path="/operations" element={<OperationsPage />} />
 
             <Route
               path="/command-center"
